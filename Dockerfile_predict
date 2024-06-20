@@ -1,0 +1,32 @@
+FROM pytorch/pytorch:2.1.0-cuda12.1-cudnn8-runtime
+
+ENV PYTHONPATH=/
+
+RUN echo ". /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc && \
+    echo "conda activate base" >> ~/.bashrc
+
+SHELL ["/bin/bash", "-c"]
+WORKDIR /
+
+# Install requirements
+COPY requirements_pip.txt /
+RUN pip3 install -r /requirements_pip.txt
+
+# pre-download tokenizer and models
+RUN mkdir /models
+RUN mkdir /tokenizer
+COPY download_models_and_tokenizer.py /
+RUN python3 download_models_and_tokenizer.py
+
+# copy script files
+COPY common_training /common_training/
+COPY predict.py /predict.py
+
+# switch to local tokenizers
+RUN sed -i -e 's/microsoft\/deberta-v2-xxlarge/\/tokenizer\/microsoft\/deberta-v2-xxlarge/g' predict.py
+RUN sed -i -e 's/FacebookAI\/xlm-roberta-large/\/tokenizer\/FacebookAI\/xlm-roberta-large/g' predict.py
+
+RUN echo '#!/bin/bash' > /run.sh && \
+echo 'python3 /predict.py --sentences-file /dataset/sentences.tsv --output-file /output/run.tsv --models-dir /models' >> /run.sh
+
+ENTRYPOINT [ "sh", "/run.sh" ]

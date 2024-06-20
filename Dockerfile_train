@@ -1,0 +1,47 @@
+FROM pytorch/pytorch:2.1.0-cuda12.1-cudnn8-runtime
+
+ENV PYTHONPATH=/
+
+RUN echo ". /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc && \
+    echo "conda activate base" >> ~/.bashrc
+
+SHELL ["/bin/bash", "-c"]
+WORKDIR /
+
+RUN conda update -n base -c defaults conda && \
+    conda install -y python=3.11 && \
+    conda update --all --yes
+
+COPY requirements_pip.txt /
+RUN pip3 install -r /requirements_pip.txt
+
+COPY common_training /common_training/
+COPY train.py /
+
+# create run file for ensemble
+
+RUN echo '#!/bin/bash' > /run.sh && \
+echo "set -e" >> /run.sh && \
+echo "echo 'Model 1'" >> /run.sh && \
+echo "python3 /train.py --num-epochs 12 --random-seed 66 --loss-fn-type non-weighted --target-column hv_label --model-langs english --ds-dir /dataset --ckpt-dir /models" >> /run.sh && \
+echo "echo 'Model 2'" >> /run.sh && \
+echo "python3 /train.py --num-epochs 12 --random-seed 66 --loss-fn-type weighted --target-column hv_label --model-langs english --ds-dir /dataset --ckpt-dir /models" >> /run.sh && \
+echo "echo 'Model 3'" >> /run.sh && \
+echo "python3 /train.py --num-epochs 12 --random-seed 67 --loss-fn-type non-weighted --target-column hv_label --model-langs english --ds-dir /dataset --ckpt-dir /models" >> /run.sh && \
+echo "echo 'Model 4'" >> /run.sh && \
+echo "python3 /train.py --num-epochs 12 --random-seed 67 --loss-fn-type weighted --target-column hv_label --model-langs english --ds-dir /dataset --ckpt-dir /models" >> /run.sh && \
+echo "echo 'Model 5'" >> /run.sh && \
+echo "python3 /train.py --num-epochs 10 --random-seed 66 --loss-fn-type non-weighted --target-column hv_label --model-langs non-english --ds-dir /dataset --ckpt-dir /models" >> /run.sh && \
+echo "echo 'Model 6'" >> /run.sh && \
+echo "python3 /train.py --num-epochs 10 --random-seed 66 --loss-fn-type weighted --target-column hv_label --model-langs non-english --ds-dir /dataset --ckpt-dir /models" >> /run.sh && \
+echo "echo 'Model 7'" >> /run.sh && \
+echo "python3 /train.py --num-epochs 10 --random-seed 67 --loss-fn-type non-weighted --target-column hv_label --model-langs non-english --ds-dir /dataset --ckpt-dir /models" >> /run.sh && \
+echo "echo 'Model 8'" >> /run.sh && \
+echo "python3 /train.py --num-epochs 10 --random-seed 67 --loss-fn-type weighted --target-column hv_label --model-langs non-english --ds-dir /dataset --ckpt-dir /models" >> /run.sh && \
+echo "echo 'Model 9'" >> /run.sh && \
+echo "python3 /train.py --num-epochs 12 --random-seed 66 --loss-fn-type non-weighted --target-column attainment --model-langs english --ds-dir /dataset --ckpt-dir /models" >> /run.sh && \
+echo "echo 'Model 10'" >> /run.sh && \
+echo "python3 /train.py --num-epochs 12 --random-seed 66 --loss-fn-type non-weighted --target-column attainment --model-langs non-english --ds-dir /dataset --ckpt-dir /models" >> /run.sh && \
+echo "echo 'Done.'" >> /run.sh
+
+ENTRYPOINT [ "sh", "run.sh" ]
