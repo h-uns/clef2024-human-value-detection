@@ -34,24 +34,24 @@ python predict.py \
 ### Training
 ```bash
 # build
-docker build -f Dockerfile_train -t valueeval24-arthur-shopenhauer-train-ensemble:1.0.0 .
+docker build -f Dockerfile_train -t valueeval24-arthur-schopenhauer-train-ensemble:1.0.0 .
 
 # run
 docker run --rm \
   -v "$PWD/valueeval24:/dataset" -v "$PWD/models:/models" \
-  valueeval24-arthur-shopenhauer-train-ensemble:1.0.0
+  valueeval24-arthur-schopenhauer-train-ensemble:1.0.0
 ```
 
 ### Prediction
 - uses models from [https://huggingface.co/h-uns](https://huggingface.co/h-uns)
 ```bash
 # build
-docker build -f Dockerfile_predict -t valueeval24-arthur-shopenhauer-ensemble:1.0.0 .
+docker build -f Dockerfile_predict -t valueeval24-arthur-schopenhauer-ensemble:1.0.0 .
 
 # run
 docker run --rm \
   -v "$PWD/valueeval24/test:/dataset" -v "$PWD/output:/output" \
-  valueeval24-arthur-shopenhauer-ensemble:1.0.0
+  valueeval24-arthur-schopenhauer-ensemble:1.0.0
 
 # view results
 cat output/run.tsv
