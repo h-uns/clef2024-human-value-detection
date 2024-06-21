@@ -8,10 +8,6 @@ RUN echo ". /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc && \
 SHELL ["/bin/bash", "-c"]
 WORKDIR /
 
-RUN conda update -n base -c defaults conda && \
-    conda install -y python=3.11 && \
-    conda update --all --yes
-
 COPY requirements_pip.txt /
 RUN pip3 install -r /requirements_pip.txt
 

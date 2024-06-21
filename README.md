@@ -1,4 +1,4 @@
-# Team arthur-shopenhauer for ValueEval'24
+# Team arthur-schopenhauer for ValueEval'24
 
 ## Local execution
 
@@ -43,6 +43,7 @@ docker run --rm \
 ```
 
 ### Prediction
+- uses models from [https://huggingface.co/h-uns](https://huggingface.co/h-uns)
 ```bash
 # build
 docker build -f Dockerfile_predict -t valueeval24-arthur-shopenhauer-ensemble:1.0.0 .
