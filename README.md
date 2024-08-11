@@ -1,5 +1,7 @@
 # Team arthur-schopenhauer for ValueEval'24
 
+Link to paper: https://ceur-ws.org/Vol-3740/paper-339.pdf
+
 ## Local execution
 
 ### Training the models
